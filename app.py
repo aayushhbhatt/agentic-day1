@@ -6,31 +6,22 @@ from langchain_core.messages import SystemMessage, HumanMessage
 
 
 def main() -> None:
-    # 1) Load environment variables
     load_dotenv()
 
-    # 2) Read configuration from environment (safe defaults)
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError(
-            "Missing OPENAI_API_KEY. Create a .env file with OPENAI_API_KEY=... "
-            "and ensure it is loaded via load_dotenv()."
+            "Missing OPENAI_API_KEY"
         )
 
     model_name = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
     temperature = float(os.getenv("OPENAI_TEMPERATURE", "0"))
 
-    # 3) Initialize a LangChain chat model (required)
     llm = ChatOpenAI(
         model=model_name,
         temperature=temperature,
         api_key=api_key,
     )
-
-    # ------------------------------------------------------------
-    # 2️⃣ Context Break Demonstration (Naïve Invocation)
-    # ------------------------------------------------------------
-    print("\n=== Naïve string-based invocation (context breaks) ===")
 
     resp1 = llm.invoke("We are building an AI system for processing medical insurance claims.")
     print("\n[resp1]")
@@ -50,9 +41,8 @@ def main() -> None:
     # In production, this leads to inconsistent outputs and brittle UX unless the application
     # explicitly carries forward conversation state.
 
-    # ------------------------------------------------------------
-    # 3️⃣ Context Fix Using Messages API (structured history)
-    # ------------------------------------------------------------
+
+    # Messages API (structured history)
     print("\n=== Message-based invocation (context preserved) ===")
 
     messages = [
